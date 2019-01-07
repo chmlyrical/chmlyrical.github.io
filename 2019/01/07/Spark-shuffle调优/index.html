@@ -22,7 +22,7 @@
     <meta name="description" content="">
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>feiF&#39;s Studio</title>
+    <title>Spark shuffle调优 · feiF&#39;s Studio</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -77,6 +77,8 @@
 
     <link rel="preload" href="/css/style.css?v=20180824" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="stylesheet" href="/css/mobile.css?v=20180824" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     
     <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
 /* This file is meant as a standalone workflow for
@@ -201,14 +203,23 @@
 </head>
 
     
-        <body class="home-body">
+        <body class="post-body">
     
     
-<header class="header index-header">
+<header class="header">
 
     <div class="read-progress"></div>
     <div class="header-sidebar-menu">&#xe775;</div>
     <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">feiF&#39;s Studio.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">Spark shuffle调优</a>
+            </div>
+    </div>
     
     <a class="home-link" href="/">feiF's Studio.</a>
 </header>
@@ -227,17 +238,17 @@ height:50vh;
     <!-- 主页  -->
     
     
-    <!-- 文章页  -->
+    <!-- 404页  -->
             
     <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/intro/index-bg.jpg)"></div>
+    <div class="site-intro-img" style="background-image: url(https://source.unsplash.com/random/1600x500)"></div>
     <div class="site-intro-meta">
         <!-- 标题  -->
         <h1 class="intro-title">
             <!-- 主页  -->
             
-            feiF's Studio.
-            <!-- 文章页  -->
+            Spark shuffle调优
+            <!-- 404 -->
             
         </h1>
         <!-- 副标题 -->
@@ -245,12 +256,43 @@ height:50vh;
             <!-- 主页副标题  -->
             
             
-                It`s better to be self-discipline than anxiety
-            
-            <!-- 文章页  -->
+            <!-- 404 -->
             
         </p>
         <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                
+                    <div class="post-intro-read">
+                        <span>字数统计: <span class="post-count word-count">1.4k</span>阅读时长: <span class="post-count reading-time">5 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/01/07</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
         
     </div>
 </div>
@@ -351,168 +393,92 @@ height:50vh;
 </script>        
         <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
         <div class="container container-unloaded">
-            <main class="main index-page">
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/01/07/Spark-shuffle调优/">
-            
-                <span>Spark shuffle调优</span>
-        </a>
-        <div class="abstract-content">
-            Spark shuffle调优Spark shuffle是什么
-Shuffle在Spark中即是把父RDD中的KV对按照Key重新分区，从而得到一个新的RDD。也就是说原本同属于父RDD同一个分区的数据需要进入到子RDD的不同的分区。现在的spark版本默认使用的是sortshuffle
+            <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="Spark-shuffle调优"><a href="#Spark-shuffle调优" class="headerlink" title="Spark shuffle调优"></a>Spark shuffle调优</h1><h2 id="Spark-shuffle是什么"><a href="#Spark-shuffle是什么" class="headerlink" title="Spark shuffle是什么"></a>Spark shuffle是什么</h2><blockquote>
+<p>Shuffle在Spark中即是把父RDD中的KV对按照Key重新分区，从而得到一个新的RDD。也就是说原本同属于父RDD同一个分区的数据需要进入到子RDD的不同的分区。<br>现在的spark版本默认使用的是sortshuffle</p>
+</blockquote>
+<h2 id="shuffle在哪里产生"><a href="#shuffle在哪里产生" class="headerlink" title="shuffle在哪里产生"></a>shuffle在哪里产生</h2><blockquote>
+<p>shuffle在spark的算子中产生,也就是运行task的时候才会产生shuffle.</p>
+</blockquote>
+<h2 id="sortShuffleManager"><a href="#sortShuffleManager" class="headerlink" title="sortShuffleManager"></a>sortShuffleManager</h2><blockquote>
+<p>spark shuffle的默认计算引擎叫sortshuffleManager,它负责shuffle过程的执行、计算和组件的处理，sortshuffleManager会将task进行shuffle操作时产生的临时磁盘文件合并成一个磁盘文件，在下一个stage的shuffle read task拉取自己的数据时，只要根据索引读取每个磁盘文件中的部分数据即可。</p>
+</blockquote>
+<h2 id="sortshuffle的内部机制"><a href="#sortshuffle的内部机制" class="headerlink" title="sortshuffle的内部机制"></a>sortshuffle的内部机制</h2><p><img src="http://assets.processon.com/chart_image/5c33479ae4b048f108c5b7f8.png?_=1546865246980" alt="image"></p>
+<ul>
+<li><p>数据会根据不同的shuffle算子存储到map数据结构(如reduceByKey)或者array数据结构(join);不过Map是一边聚合,一边写入内存,array是直接写入内存. 当内存达到一个阈值,就会溢出写到磁盘,因此在溢出这个环节会在磁盘上产生多个临时文件,磁盘上的这些文件需要合并,于是spark就有了merge机制.</p>
+</li>
+<li><p>在溢写到磁盘之前,在内存中会按照key来排序,排序过后会进入到一个buffer缓冲区,默认为32K,缓冲区的batch默认为1万条key,也就是缓冲区以每次一万条的量写入到磁盘文件中,该缓冲区减少IO,提高性能. 缓冲区和写入磁盘使用的技术是java中的BufferedOutputStream.</p>
+</li>
+<li>merge会将之前产生的所有的临时文件进行合并,包括缓冲区读写到磁盘上的文件,合并成一个大的文件到磁盘,默认为48M,与这个文件相对应的还有一个索引文件,索引文件里面记录的是这个文件的元信息,且这个磁盘文件也是下游stage的Task的输入信息! 注: 一个下游的task对应一个磁盘文件和这个磁盘文件的元信息. 于是就有了血统,继承之类的!</li>
+</ul>
+<h2 id="shuffle当中可能会遇到的问题"><a href="#shuffle当中可能会遇到的问题" class="headerlink" title="shuffle当中可能会遇到的问题"></a>shuffle当中可能会遇到的问题</h2><ol>
+<li>数据量非常大，从其他各台机器收集数据占用大量网络。</li>
+<li>数据如何分类，即如何Partition，Hash、Sort等；</li>
+<li>负载均衡（数据倾斜），因为采用不同的Shuffle方式对数据不同的分类，而分类之后又要跑到具体的节点上计算，如果不恰当的话，很容易产生数据倾斜；</li>
+<li>网络传输效率，需要在压缩和解压缩之间做出权衡，序列化和反序列也是要考虑的问题；</li>
+</ol>
+<p>说明：具体的Task进行计算的时候尽一切最大可能使得数据具备Process Locality的特性；退而求次是增加数据分片，减少每个Task处理的数据量。</p>
+<h2 id="shuffle调优"><a href="#shuffle调优" class="headerlink" title="shuffle调优"></a>shuffle调优</h2><h5 id="spark-shuffle-file-buffer-默认值为32K-每次1万条"><a href="#spark-shuffle-file-buffer-默认值为32K-每次1万条" class="headerlink" title="spark.shuffle.file.buffer(默认值为32K,每次1万条)"></a>spark.shuffle.file.buffer(默认值为32K,每次1万条)</h5><ul>
+<li>该参数是缓冲区的缓冲内存,如果可用的内存资源较为充足的话,可以将缓冲区的值设置大点,这样会较少磁盘IO次数.,如果合理调节该参数,性能会提升1%~5%  可以设置为64K.<h5 id="spark-reducer-maxSizeInFlight-默认为48M"><a href="#spark-reducer-maxSizeInFlight-默认为48M" class="headerlink" title="spark.reducer.maxSizeInFlight(默认为48M)"></a>spark.reducer.maxSizeInFlight(默认为48M)</h5></li>
+<li>该参数是stage的每一个task就需要将上一个stage的计算结果中的所有相同key，从各个节点上通过网络都拉取到自己所在的节点上，然后进行key的聚合或连接等操作,如果合理调节该参数(增大),性能会提升1%~5%<h5 id="spark-shuffle-io-maxRetries-默认3次"><a href="#spark-shuffle-io-maxRetries-默认3次" class="headerlink" title="spark.shuffle.io.maxRetries(默认3次)"></a>spark.shuffle.io.maxRetries(默认3次)</h5></li>
+<li><p>该参数是stage的task向上一个stage的task计算结果拉取数据,也就是上面那个操作,有时候会因为网络异常原因,导致拉取失败,失败时候默认重新拉取三次,三次过还是失败的话作业就执行失败了,根据具体的业务可以考虑将默认值增大,这样可以避免由于JVM的一些原因或者网络不稳定等因素导致的数据拉取失败.也有助于提高spark作业的稳定性. 可以适当的提升重新拉取的次数,最大为60次.</p>
+<h5 id="spark-shuffle-io-retryWait-默认为5s"><a href="#spark-shuffle-io-retryWait-默认为5s" class="headerlink" title="spark.shuffle.io.retryWait(默认为5s)"></a>spark.shuffle.io.retryWait(默认为5s)</h5></li>
+<li><p>该参数和上面一样,是每次拉取数据的间隔时间 调优建议：建议加大间隔时长（比如20s），以增加shuffle操作的稳定性</p>
+</li>
+</ul>
+<h5 id="spark-shuffle-memoryFraction-默认0-2-也就是20"><a href="#spark-shuffle-memoryFraction-默认0-2-也就是20" class="headerlink" title="spark.shuffle.memoryFraction(默认0.2,也就是20%)"></a>spark.shuffle.memoryFraction(默认0.2,也就是20%)</h5><ul>
+<li>该参数是数据根据不同的shuffle算子将数据写入内存结构中,内存结构达到阈值会溢出临时文件,这个参数就是则是内存结构的阈值百分比的,不是内存结构的内存大小. 如果内存充足，而且很少使用持久化操作，建议调高这个比例,可以减少频繁对磁盘进行IO操作,合理调节该参数可以将性能提升10%左右.</li>
+</ul>
+<h5 id="spark-shuffle-manager-默认sort"><a href="#spark-shuffle-manager-默认sort" class="headerlink" title="spark.shuffle.manager(默认sort)"></a>spark.shuffle.manager(默认sort)</h5><ul>
+<li>该参数是设置shuffle的类型,默认是sort,也就是sortshuffleManager, hash参数对应HashShuffleManager, tungsten-sort参数对应tungsten(这个很少用),HashShuffleManager是以前的版本,这个默认就行</li>
+</ul>
+<h5 id="spark-shuffle-sort-bypassMergeThreshold-默认200个"><a href="#spark-shuffle-sort-bypassMergeThreshold-默认200个" class="headerlink" title="spark.shuffle.sort.bypassMergeThreshold(默认200个)"></a>spark.shuffle.sort.bypassMergeThreshold(默认200个)</h5><ul>
+<li>该参数是如果shuffle read task的数量小于等于200个的时候,在sortshufflemanager模式下,就会启动ByPass sortshufflemanager这个调优就这样吧 ,默认200挺好的.<h5 id="spark-shuffle-consolidateFiles-默认为false"><a href="#spark-shuffle-consolidateFiles-默认为false" class="headerlink" title="spark.shuffle.consolidateFiles(默认为false)"></a>spark.shuffle.consolidateFiles(默认为false)</h5></li>
+<li>该参数只对HashshuffleManager有效,而HashshuffleManager是spark1.2之前默认使用的版本</li>
+</ul>
 
-shuffle在哪里产生
-shuffle在spark的算子中产生,也就是运行task的时候才会产生shuffle.
-
-sortShuffleManager
-spark shuffle的默认计算引擎叫sortshuffleManager,它负责shuffle过程的执行、计算和组件的处理，sortshuf...
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/01/07</span>
-            </div>
-            <!-- tags  -->
-            
-        </div>
     </article>
+    <!-- license  -->
     
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2018/12/26/深入理解JVM/">
-            
-                <span>深入理解JVM</span>
-        </a>
-        <div class="abstract-content">
-            虚拟机JRE是由Java API和JVM组成，JVM通过类加载器(Class Loader)加载Java应用，并通过Java API去执行。
-虚拟机(VM: Virtual Machine) 是通过软件模拟物理机器执行程序的执行器。最初Java语言被设计成基于虚拟机器而非物理机的原因就是为了实现WORA(一次编写，到处运行)的目的。
-JVM基本特性
-
+        <div class="license-wrapper">
+            <p>原文作者：<a href="https://studio.chmlyrical.com">feiF</a>
+            </p><p>原文链接：<a href="https://studio.chmlyrical.com/2019/01/07/Spark-shuffle调优/">https://studio.chmlyrical.com/2019/01/07/Spark-shuffle调优/</a>
+            </p><p>发表日期：<a href="https://studio.chmlyrical.com/2019/01/07/Spark-shuffle调优/">January 7th 2019, 8:56:35 pm</a>
+            </p><p>更新日期：<a href="https://studio.chmlyrical.com/2019/01/07/Spark-shuffle调优/">January 7th 2019, 8:57:07 pm</a>
+            </p><p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/12/26</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="Java">Java</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2018/12/26/hello-world/">
-            
-                <span>Hello World</span>
-        </a>
-        <div class="abstract-content">
-            Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick StartCreate a new post1$ hexo new "My New Post"
-More info: Writing
-Run server1$ hexo server
-More...
-        </div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/12/26</span>
-            </div>
-            <!-- tags  -->
-            
-        </div>
-    </article>
     
     <!-- paginator  -->
-    
-</main>
-            <!-- profile -->
+    <ul class="post-paginator">
+        <li class="next">
             
-            <div class="profile">
-    <img class="profile-avatar" alt="avatar" src="/avatar/feiF.jpg">
-    <div class="profile-name">feiF</div>
-    
-    <div class="profile-signature">
-        Happy Coding
-    </div>
-    
-    
-    <div class="profile-social">
-        
-    
-        
+        </li>
+        <li class="previous">
             
-                <a href="mailto:chmlyrical@163.com" class="iconfont-archer email" title="email"></a>
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2018/12/26/深入理解JVM/" title="深入理解JVM">
+                    <div class="prevTitle">深入理解JVM</div>
+                </a>
             
-        
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
     
-        
-            
-                <a href="//github.com/chmlyrical" class="iconfont-archer github" target="_blank" title="github"></a>
-            
-        
     
-        
+    <!-- partial('_partial/comment/changyan') -->
+    <!--PC版-->
+
+
     
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
-    
-        
     
 
-    </div>
-    
-    
-    
-</div>
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
             
         </div>
         <footer class="footer footer-unloaded">
@@ -588,6 +554,24 @@ More...
 </footer>
     </div>
     <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Spark-shuffle调优"><span class="toc-number">1.</span> <span class="toc-text">Spark shuffle调优</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Spark-shuffle是什么"><span class="toc-number">1.1.</span> <span class="toc-text">Spark shuffle是什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#shuffle在哪里产生"><span class="toc-number">1.2.</span> <span class="toc-text">shuffle在哪里产生</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sortShuffleManager"><span class="toc-number">1.3.</span> <span class="toc-text">sortShuffleManager</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sortshuffle的内部机制"><span class="toc-number">1.4.</span> <span class="toc-text">sortshuffle的内部机制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#shuffle当中可能会遇到的问题"><span class="toc-number">1.5.</span> <span class="toc-text">shuffle当中可能会遇到的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#shuffle调优"><span class="toc-number">1.6.</span> <span class="toc-text">shuffle调优</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#spark-shuffle-file-buffer-默认值为32K-每次1万条"><span class="toc-number">1.6.0.0.1.</span> <span class="toc-text">spark.shuffle.file.buffer(默认值为32K,每次1万条)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#spark-reducer-maxSizeInFlight-默认为48M"><span class="toc-number">1.6.0.0.2.</span> <span class="toc-text">spark.reducer.maxSizeInFlight(默认为48M)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#spark-shuffle-io-maxRetries-默认3次"><span class="toc-number">1.6.0.0.3.</span> <span class="toc-text">spark.shuffle.io.maxRetries(默认3次)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#spark-shuffle-io-retryWait-默认为5s"><span class="toc-number">1.6.0.0.4.</span> <span class="toc-text">spark.shuffle.io.retryWait(默认为5s)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#spark-shuffle-memoryFraction-默认0-2-也就是20"><span class="toc-number">1.6.0.0.5.</span> <span class="toc-text">spark.shuffle.memoryFraction(默认0.2,也就是20%)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#spark-shuffle-manager-默认sort"><span class="toc-number">1.6.0.0.6.</span> <span class="toc-text">spark.shuffle.manager(默认sort)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#spark-shuffle-sort-bypassMergeThreshold-默认200个"><span class="toc-number">1.6.0.0.7.</span> <span class="toc-text">spark.shuffle.sort.bypassMergeThreshold(默认200个)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#spark-shuffle-consolidateFiles-默认为false"><span class="toc-number">1.6.0.0.8.</span> <span class="toc-text">spark.shuffle.consolidateFiles(默认为false)</span></a></li></ol></li></ol></li></ol></li></ol></li></ol>
+    </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
     <div class="sidebar sidebar-hide">
@@ -747,6 +731,8 @@ jsonContent:
     
     </div>
     <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
      
     </body>
 </html>
