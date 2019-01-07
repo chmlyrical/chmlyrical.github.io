@@ -264,6 +264,12 @@ height:50vh;
             <div class="post-intros">
                 <!-- 文章页标签  -->
                 
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="spark">spark</a>
+    
+</div>
+                
                 
                     <div class="post-intro-read">
                         <span>字数统计: <span class="post-count word-count">1.4k</span>阅读时长: <span class="post-count reading-time">5 min</span></span>
@@ -420,12 +426,16 @@ height:50vh;
 </ol>
 <p>说明：具体的Task进行计算的时候尽一切最大可能使得数据具备Process Locality的特性；退而求次是增加数据分片，减少每个Task处理的数据量。</p>
 <h2 id="shuffle调优"><a href="#shuffle调优" class="headerlink" title="shuffle调优"></a>shuffle调优</h2><h5 id="spark-shuffle-file-buffer-默认值为32K-每次1万条"><a href="#spark-shuffle-file-buffer-默认值为32K-每次1万条" class="headerlink" title="spark.shuffle.file.buffer(默认值为32K,每次1万条)"></a>spark.shuffle.file.buffer(默认值为32K,每次1万条)</h5><ul>
-<li>该参数是缓冲区的缓冲内存,如果可用的内存资源较为充足的话,可以将缓冲区的值设置大点,这样会较少磁盘IO次数.,如果合理调节该参数,性能会提升1%~5%  可以设置为64K.<h5 id="spark-reducer-maxSizeInFlight-默认为48M"><a href="#spark-reducer-maxSizeInFlight-默认为48M" class="headerlink" title="spark.reducer.maxSizeInFlight(默认为48M)"></a>spark.reducer.maxSizeInFlight(默认为48M)</h5></li>
-<li>该参数是stage的每一个task就需要将上一个stage的计算结果中的所有相同key，从各个节点上通过网络都拉取到自己所在的节点上，然后进行key的聚合或连接等操作,如果合理调节该参数(增大),性能会提升1%~5%<h5 id="spark-shuffle-io-maxRetries-默认3次"><a href="#spark-shuffle-io-maxRetries-默认3次" class="headerlink" title="spark.shuffle.io.maxRetries(默认3次)"></a>spark.shuffle.io.maxRetries(默认3次)</h5></li>
-<li><p>该参数是stage的task向上一个stage的task计算结果拉取数据,也就是上面那个操作,有时候会因为网络异常原因,导致拉取失败,失败时候默认重新拉取三次,三次过还是失败的话作业就执行失败了,根据具体的业务可以考虑将默认值增大,这样可以避免由于JVM的一些原因或者网络不稳定等因素导致的数据拉取失败.也有助于提高spark作业的稳定性. 可以适当的提升重新拉取的次数,最大为60次.</p>
-<h5 id="spark-shuffle-io-retryWait-默认为5s"><a href="#spark-shuffle-io-retryWait-默认为5s" class="headerlink" title="spark.shuffle.io.retryWait(默认为5s)"></a>spark.shuffle.io.retryWait(默认为5s)</h5></li>
-<li><p>该参数和上面一样,是每次拉取数据的间隔时间 调优建议：建议加大间隔时长（比如20s），以增加shuffle操作的稳定性</p>
-</li>
+<li>该参数是缓冲区的缓冲内存,如果可用的内存资源较为充足的话,可以将缓冲区的值设置大点,这样会较少磁盘IO次数.,如果合理调节该参数,性能会提升1%~5%  可以设置为64K.</li>
+</ul>
+<h5 id="spark-reducer-maxSizeInFlight-默认为48M"><a href="#spark-reducer-maxSizeInFlight-默认为48M" class="headerlink" title="spark.reducer.maxSizeInFlight(默认为48M)"></a>spark.reducer.maxSizeInFlight(默认为48M)</h5><ul>
+<li>该参数是stage的每一个task就需要将上一个stage的计算结果中的所有相同key，从各个节点上通过网络都拉取到自己所在的节点上，然后进行key的聚合或连接等操作,如果合理调节该参数(增大),性能会提升1%~5%</li>
+</ul>
+<h5 id="spark-shuffle-io-maxRetries-默认3次"><a href="#spark-shuffle-io-maxRetries-默认3次" class="headerlink" title="spark.shuffle.io.maxRetries(默认3次)"></a>spark.shuffle.io.maxRetries(默认3次)</h5><ul>
+<li>该参数是stage的task向上一个stage的task计算结果拉取数据,也就是上面那个操作,有时候会因为网络异常原因,导致拉取失败,失败时候默认重新拉取三次,三次过还是失败的话作业就执行失败了,根据具体的业务可以考虑将默认值增大,这样可以避免由于JVM的一些原因或者网络不稳定等因素导致的数据拉取失败.也有助于提高spark作业的稳定性. 可以适当的提升重新拉取的次数,最大为60次.</li>
+</ul>
+<h5 id="spark-shuffle-io-retryWait-默认为5s"><a href="#spark-shuffle-io-retryWait-默认为5s" class="headerlink" title="spark.shuffle.io.retryWait(默认为5s)"></a>spark.shuffle.io.retryWait(默认为5s)</h5><ul>
+<li>该参数和上面一样,是每次拉取数据的间隔时间 调优建议：建议加大间隔时长（比如20s），以增加shuffle操作的稳定性</li>
 </ul>
 <h5 id="spark-shuffle-memoryFraction-默认0-2-也就是20"><a href="#spark-shuffle-memoryFraction-默认0-2-也就是20" class="headerlink" title="spark.shuffle.memoryFraction(默认0.2,也就是20%)"></a>spark.shuffle.memoryFraction(默认0.2,也就是20%)</h5><ul>
 <li>该参数是数据根据不同的shuffle算子将数据写入内存结构中,内存结构达到阈值会溢出临时文件,这个参数就是则是内存结构的阈值百分比的,不是内存结构的内存大小. 如果内存充足，而且很少使用持久化操作，建议调高这个比例,可以减少频繁对磁盘进行IO操作,合理调节该参数可以将性能提升10%左右.</li>
@@ -434,7 +444,9 @@ height:50vh;
 <li>该参数是设置shuffle的类型,默认是sort,也就是sortshuffleManager, hash参数对应HashShuffleManager, tungsten-sort参数对应tungsten(这个很少用),HashShuffleManager是以前的版本,这个默认就行</li>
 </ul>
 <h5 id="spark-shuffle-sort-bypassMergeThreshold-默认200个"><a href="#spark-shuffle-sort-bypassMergeThreshold-默认200个" class="headerlink" title="spark.shuffle.sort.bypassMergeThreshold(默认200个)"></a>spark.shuffle.sort.bypassMergeThreshold(默认200个)</h5><ul>
-<li>该参数是如果shuffle read task的数量小于等于200个的时候,在sortshufflemanager模式下,就会启动ByPass sortshufflemanager这个调优就这样吧 ,默认200挺好的.<h5 id="spark-shuffle-consolidateFiles-默认为false"><a href="#spark-shuffle-consolidateFiles-默认为false" class="headerlink" title="spark.shuffle.consolidateFiles(默认为false)"></a>spark.shuffle.consolidateFiles(默认为false)</h5></li>
+<li>该参数是如果shuffle read task的数量小于等于200个的时候,在sortshufflemanager模式下,就会启动ByPass sortshufflemanager这个调优就这样吧 ,默认200挺好的.</li>
+</ul>
+<h5 id="spark-shuffle-consolidateFiles-默认为false"><a href="#spark-shuffle-consolidateFiles-默认为false" class="headerlink" title="spark.shuffle.consolidateFiles(默认为false)"></a>spark.shuffle.consolidateFiles(默认为false)</h5><ul>
 <li>该参数只对HashshuffleManager有效,而HashshuffleManager是spark1.2之前默认使用的版本</li>
 </ul>
 
@@ -445,7 +457,7 @@ height:50vh;
             <p>原文作者：<a href="https://studio.chmlyrical.com">feiF</a>
             </p><p>原文链接：<a href="https://studio.chmlyrical.com/2019/01/07/Spark-shuffle调优/">https://studio.chmlyrical.com/2019/01/07/Spark-shuffle调优/</a>
             </p><p>发表日期：<a href="https://studio.chmlyrical.com/2019/01/07/Spark-shuffle调优/">January 7th 2019, 8:56:35 pm</a>
-            </p><p>更新日期：<a href="https://studio.chmlyrical.com/2019/01/07/Spark-shuffle调优/">January 7th 2019, 8:57:07 pm</a>
+            </p><p>更新日期：<a href="https://studio.chmlyrical.com/2019/01/07/Spark-shuffle调优/">January 7th 2019, 9:01:27 pm</a>
             </p><p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
     
@@ -608,8 +620,6 @@ top:50vh;
     
     
     
-    
-    
     <div class="total-and-search">
         <div class="total-archive">
         Total : 3
@@ -663,6 +673,8 @@ top:50vh;
   </div>
         <div class="sidebar-panel-tags">
     <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="spark"><span class="iconfont-archer">&#xe606;</span>spark</span>
     
         <span class="sidebar-tag-name" data-tags="Java"><span class="iconfont-archer">&#xe606;</span>Java</span>
     
