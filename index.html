@@ -364,14 +364,14 @@ height:50vh;
                 <span>Spark shuffle调优</span>
         </a>
         <div class="abstract-content">
-            Spark shuffle调优Spark shuffle是什么
+            Spark shuffle是什么
 Shuffle在Spark中即是把父RDD中的KV对按照Key重新分区，从而得到一个新的RDD。也就是说原本同属于父RDD同一个分区的数据需要进入到子RDD的不同的分区。现在的spark版本默认使用的是sortshuffle
 
 shuffle在哪里产生
 shuffle在spark的算子中产生,也就是运行task的时候才会产生shuffle.
 
 sortShuffleManager
-spark shuffle的默认计算引擎叫sortshuffleManager,它负责shuffle过程的执行、计算和组件的处理，sortshuf...
+spark shuffle的默认计算引擎叫sortshuffleManager,它负责shuffle过程的执行、计算和组件的处理，sortshuffleManager会将tas...
         </div>
         <div class="abstract-post-meta">
             <!-- date  -->
