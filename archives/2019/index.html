@@ -346,6 +346,48 @@
     
     
     <article class="index-post">
+        <a class="abstract-title" href="/2019/01/14/HashMap个人理解/">
+            
+                <span>HashMap个人理解</span>
+        </a>
+        <div class="abstract-content">
+            HashMap底层架构
+HashMap底层是由数组和链表构成数组在查找的时候可以根据hashCode进行一次寻址[ O(1) ]就可以查到当前数据位置，然后再遍历链表[ O(n) ]查询即可。
+
+HashMap几个比较重要的参数
+transient
+实际存储kv的个数
+
+
+threshold
+阈值，当table == {}时，该值为初始容量（初始容量默认为16）；当table被填充了，也就是为table分配内存空间后，threshold一般为 capacity*loadFactory。HashMap在进行扩容时需要参考threshold
+
+
+loadFactor
+负载因子，默认为0.75...
+        </div>
+        <div class="abstract-post-meta">
+            <!-- date  -->
+            <div class="abstract-date">
+                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/01/14</span>
+            </div>
+            <!-- tags  -->
+            
+            <div class="abstract-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Java">Java</a>
+    
+</div>
+            
+        </div>
+    </article>
+    
+    
+    
+    
+    
+    
+    <article class="index-post">
         <a class="abstract-title" href="/2019/01/07/Spark-shuffle调优/">
             
                 <span>Spark shuffle调优</span>
@@ -484,9 +526,16 @@ spark shuffle的默认计算引擎叫sortshuffleManager,它负责shuffle过程�
     
     
     
+    
+    
+    
+    
+    
+    
+    
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 2
+        Total : 3
         </div>
         <!-- search  -->
         
@@ -499,6 +548,11 @@ spark shuffle的默认计算引擎叫sortshuffleManager,它负责shuffle过程�
     
     <div class="archive-year"> 2019 </div>
     <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/14</span><a class="archive-post-title" href="/2019/01/14/HashMap个人理解/">HashMap个人理解</a>
+        </li>
     
     
         <li class="archive-post-item">

@@ -22,7 +22,7 @@
     <meta name="description" content="">
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>深入理解JVM · feiF&#39;s Studio</title>
+    <title>HashMap个人理解 · feiF&#39;s Studio</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -217,7 +217,7 @@
                 <a href="/">feiF&#39;s Studio.</a>
             </div>
             <div class="post-title">
-                <a href="#" class="post-name">深入理解JVM</a>
+                <a href="#" class="post-name">HashMap个人理解</a>
             </div>
     </div>
     
@@ -247,7 +247,7 @@ height:50vh;
         <h1 class="intro-title">
             <!-- 主页  -->
             
-            深入理解JVM
+            HashMap个人理解
             <!-- 404 -->
             
         </h1>
@@ -272,12 +272,12 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>字数统计: <span class="post-count word-count">102</span>阅读时长: <span class="post-count reading-time">1 min</span></span>
+                        <span>字数统计: <span class="post-count word-count">1k</span>阅读时长: <span class="post-count reading-time">3 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
                     <span class="post-intro-calander iconfont-archer">&#xe676;</span>
-                    <span class="post-intro-time">2018/12/26</span>
+                    <span class="post-intro-time">2019/01/14</span>
                     
                     <span id="busuanzi_container_page_pv" class="busuanzi-pv">
                         <span class="iconfont-archer">&#xe602;</span>
@@ -401,18 +401,61 @@ height:50vh;
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        <h2 id="虚拟机"><a href="#虚拟机" class="headerlink" title="虚拟机"></a>虚拟机</h2><p>JRE是由Java API和JVM组成，JVM通过类加载器(Class Loader)加载Java应用，并通过Java API去执行。</p>
-<p><strong>虚拟机(VM: Virtual Machine)</strong> 是通过软件模拟物理机器执行程序的执行器。最初Java语言被设计成基于虚拟机器而非物理机的原因就是为了实现WORA(一次编写，到处运行)的目的。</p>
-<p><strong>JVM基本特性</strong></p>
+        <h2 id="HashMap底层架构"><a href="#HashMap底层架构" class="headerlink" title="HashMap底层架构"></a>HashMap底层架构</h2><blockquote>
+<p>HashMap底层是由数组和链表构成数组在查找的时候可以根据hashCode进行一次寻址[ O(1) ]就可以查到当前数据位置，然后再遍历链表[ O(n) ]查询即可。</p>
+</blockquote>
+<h2 id="HashMap几个比较重要的参数"><a href="#HashMap几个比较重要的参数" class="headerlink" title="HashMap几个比较重要的参数"></a>HashMap几个比较重要的参数</h2><ul>
+<li><h4 id="transient"><a href="#transient" class="headerlink" title="transient"></a>transient</h4><blockquote>
+<p>实际存储kv的个数</p>
+</blockquote>
+</li>
+<li><h4 id="threshold"><a href="#threshold" class="headerlink" title="threshold"></a>threshold</h4><blockquote>
+<p>阈值，当table == {}时，该值为初始容量（初始容量默认为16）；当table被填充了，也就是为table分配内存空间后，threshold一般为 capacity*loadFactory。HashMap在进行扩容时需要参考threshold</p>
+</blockquote>
+</li>
+<li><h4 id="loadFactor"><a href="#loadFactor" class="headerlink" title="loadFactor"></a>loadFactor</h4><blockquote>
+<p>负载因子，默认为0.75，表示当前table的填充度</p>
+</blockquote>
+</li>
+<li><h4 id="modCount"><a href="#modCount" class="headerlink" title="modCount"></a>modCount</h4><blockquote>
+<p>用于快速失败，由于HashMap非线程安全，在对HashMap进行迭代时，如果期间其他线程的参与导致HashMap的结构发生变化了（比如put，remove等操作），需要抛出异常</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="hash函数"><a href="#hash函数" class="headerlink" title="hash函数"></a>hash函数</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *对key的hashcode进一步进行计算以及二进制位的调整等来保证最终获取的存储位置尽量分布均匀</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object k)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> h = hashSeed;</span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> != h &amp;&amp; k <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">        <span class="keyword">return</span> sun.misc.Hashing.stringHash32((String) k);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    h ^= k.hashCode();</span><br><span class="line"></span><br><span class="line">    h ^= (h &gt;&gt;&gt; <span class="number">20</span>) ^ (h &gt;&gt;&gt; <span class="number">12</span>);</span><br><span class="line">    <span class="keyword">return</span> h ^ (h &gt;&gt;&gt; <span class="number">7</span>) ^ (h &gt;&gt;&gt; <span class="number">4</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 返回数组下标</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">indexFor</span><span class="params">(<span class="keyword">int</span> h, <span class="keyword">int</span> length)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> h &amp; (length-<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">example -&gt; length-<span class="number">1</span>=<span class="number">15</span>，h=<span class="number">18</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="number">1</span>  <span class="number">0</span>  <span class="number">0</span>  <span class="number">1</span>  <span class="number">0</span></span><br><span class="line">    &amp;   <span class="number">0</span>  <span class="number">1</span>  <span class="number">1</span>  <span class="number">1</span>  <span class="number">1</span></span><br><span class="line">    __________________</span><br><span class="line">        <span class="number">0</span>  <span class="number">0</span>  <span class="number">0</span>  <span class="number">1</span>  <span class="number">0</span>    = <span class="number">2</span></span><br></pre></td></tr></table></figure>
+<h2 id="扩容"><a href="#扩容" class="headerlink" title="扩容"></a>扩容</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">addEntry</span><span class="params">(<span class="keyword">int</span> hash, K key, V value, <span class="keyword">int</span> bucketIndex)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> ((size &gt;= threshold) &amp;&amp; (<span class="keyword">null</span> != table[bucketIndex])) &#123;</span><br><span class="line">            resize(<span class="number">2</span> * table.length);<span class="comment">//当size超过临界阈值threshold，并且即将发生哈希冲突时进行扩容</span></span><br><span class="line">            hash = (<span class="keyword">null</span> != key) ? hash(key) : <span class="number">0</span>;</span><br><span class="line">            bucketIndex = indexFor(hash, table.length);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        createEntry(hash, key, value, bucketIndex);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>通过以上代码能够得知，当发生哈希冲突并且size大于阈值的时候，需要进行数组扩容，扩容时，需要新建一个长度为之前数组2倍的新的数组，然后将当前的Entry数组中的元素全部传输过去，扩容后的新数组长度为之前的2倍，所以扩容相对来说是个耗资源的操作。</p>
+</blockquote>
+<blockquote>
+<p>在数组扩容的同事，需要将老数组的<strong>数据的引用</strong>复制到新数组中去</p>
+</blockquote>
+<h3 id="扩容为什么一定要是2的次幂"><a href="#扩容为什么一定要是2的次幂" class="headerlink" title="扩容为什么一定要是2的次幂"></a>扩容为什么一定要是2的次幂</h3><ul>
+<li>hashMap的数组长度一定保持2的次幂，比如16的二进制表示为 10000，那么length-1就是15，二进制为01111，同理扩容后的数组长度为32，二进制表示为100000，length-1为31，二进制表示为011111。从下图可以我们也能看到这样会保证低位全为1，而扩容后只有一位差异，也就是多出了最左位的1，这样在通过 h&amp;(length-1)的时候，只要h对应的最左边的那一个差异位为0，就能保证得到的新的数组索引和老数组索引一致(大大减少了之前已经散列良好的老数组的数据位置重新调换)，个人理解。</li>
+</ul>
+<p><img src="http://assets.processon.com/chart_image/5c3bf517e4b0db2e59333bcc.png?_=1547433680190" alt="image">
+　　</p>
+<ul>
+<li>还有，数组长度保持2的次幂，length-1的低位都为1，会使得获得的数组索引index更加均匀，比如：</li>
+</ul>
+<p><img src="http://assets.processon.com/chart_image/5c3bf6eee4b025fe7c7badf8.png?_=1547434414754" alt="image"></p>
+<ul>
+<li>我们看到，上面的&amp;运算，高位是不会对结果产生影响的（hash函数采用各种位运算可能也是为了使得低位更加散列），我们只关注低位bit，如果低位全部为1，那么对于h低位部分来说，任何一位的变化都会对结果产生影响，也就是说，要得到index=21这个存储位置，h的低位只有这一种组合。这也是数组长度设计为必须为2的次幂的原因。</li>
+</ul>
+<p><img src="http://assets.processon.com/chart_image/5c3bf9c4e4b056ae29edd10e.png?_=1547434582368" alt="image"></p>
+<ul>
+<li>如果不是2的次幂，也就是低位不是全为1此时，要使得index=21，h的低位部分不再具有唯一性了，哈希冲突的几率会变的更大，同时，index对应的这个bit位无论如何不会等于1了，而对应的那些数组位置也就被白白浪费了。</li>
+</ul>
 
     </article>
     <!-- license  -->
     
         <div class="license-wrapper">
             <p>原文作者：<a href="https://studio.chmlyrical.com">feiF</a>
-            </p><p>原文链接：<a href="https://studio.chmlyrical.com/2018/12/26/深入理解JVM/">https://studio.chmlyrical.com/2018/12/26/深入理解JVM/</a>
-            </p><p>发表日期：<a href="https://studio.chmlyrical.com/2018/12/26/深入理解JVM/">December 26th 2018, 2:19:10 pm</a>
-            </p><p>更新日期：<a href="https://studio.chmlyrical.com/2018/12/26/深入理解JVM/">December 26th 2018, 3:24:33 pm</a>
+            </p><p>原文链接：<a href="https://studio.chmlyrical.com/2019/01/14/HashMap个人理解/">https://studio.chmlyrical.com/2019/01/14/HashMap个人理解/</a>
+            </p><p>发表日期：<a href="https://studio.chmlyrical.com/2019/01/14/HashMap个人理解/">January 14th 2019, 10:58:28 am</a>
+            </p><p>更新日期：<a href="https://studio.chmlyrical.com/2019/01/14/HashMap个人理解/">January 14th 2019, 10:59:16 am</a>
             </p><p>版权声明：本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
     
@@ -420,13 +463,13 @@ height:50vh;
     <ul class="post-paginator">
         <li class="next">
             
-                <div class="nextSlogan">Next Post</div>
-                <a href="/2019/01/07/Spark-shuffle调优/" title="Spark shuffle调优">
-                    <div class="nextTitle">Spark shuffle调优</div>
-                </a>
-            
         </li>
         <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2019/01/07/Spark-shuffle调优/" title="Spark shuffle调优">
+                    <div class="prevTitle">Spark shuffle调优</div>
+                </a>
             
         </li>
     </ul>
@@ -537,7 +580,7 @@ top:50vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#虚拟机"><span class="toc-number">1.</span> <span class="toc-text">虚拟机</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#HashMap底层架构"><span class="toc-number">1.</span> <span class="toc-text">HashMap底层架构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HashMap几个比较重要的参数"><span class="toc-number">2.</span> <span class="toc-text">HashMap几个比较重要的参数</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#transient"><span class="toc-number">2.0.1.</span> <span class="toc-text">transient</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#threshold"><span class="toc-number">2.0.2.</span> <span class="toc-text">threshold</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#loadFactor"><span class="toc-number">2.0.3.</span> <span class="toc-text">loadFactor</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#modCount"><span class="toc-number">2.0.4.</span> <span class="toc-text">modCount</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hash函数"><span class="toc-number">3.</span> <span class="toc-text">hash函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#扩容"><span class="toc-number">4.</span> <span class="toc-text">扩容</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#扩容为什么一定要是2的次幂"><span class="toc-number">4.1.</span> <span class="toc-text">扩容为什么一定要是2的次幂</span></a></li></ol></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
